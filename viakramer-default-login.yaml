@@ -1,0 +1,39 @@
+id: viakramer-default-login
+
+info:
+  name: VIA - Default Login
+  author: nbandodk
+  severity: medium
+  description: |
+    VIA kramer device running on default credentials for management gateway
+  metadata:
+    shodan-query: http.html:"viaIndex"
+  tags: via,default-login
+
+requests:
+  - raw:
+    - |
+      POST /viaIndex/login HTTP/1.1
+      Host: {{Hostname}}
+      Cookie: PHPSESSID=helg5oih3feur4tb4kgmjpvqt5
+      Content-Type: application/x-www-form-urlencoded
+
+      login_name={{username}}&login_password={{password}}&submit=Login
+
+    attack: pitchfork
+    payloads:
+      username:
+        - "su"
+      password:
+        - "supass"
+
+    matchers-condition: and
+    matchers:
+      - type: word
+        part: header
+        words:
+          - "Location: /home"
+
+      - type: status
+        status:
+          - 302
